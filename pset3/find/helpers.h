@@ -18,3 +18,12 @@ bool search(int value, int values[], int n);
  * Sorts array of n values.
  */
 void sort(int values[], int n);
+
+/**
+ * Recursive binary search called from search() above. Returns
+ * true if value is in array, else false.
+ *
+ * max is highest index we'll be checking.
+*/
+bool binsrch(int value, int array[], int max);
+
