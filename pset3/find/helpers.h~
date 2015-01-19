@@ -25,5 +25,5 @@ void sort(int values[], int n);
  *
  * max is highest index we'll be checking.
 */
-bool binsrch(int value, int array[], int min, int max);
+bool binsrch(int value, int array[], int max);
 

@@ -54,7 +54,7 @@ bool binsrch(int value, int array[], int min, int max)
 	if ( min > max ) return false;
 
 	// find midpoint (of only those numbers we're actually looking at)
-	int mid = ((max - min) / 2) + min;
+	int mid = (max - min) / 2;
 
 	// compare to search key
 	if ( array[mid] == value ) return true;
