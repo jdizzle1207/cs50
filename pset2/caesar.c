@@ -85,7 +85,7 @@ int main (int argc, char* argv[])
 	 * print result
 	 */
 
-	printf("%s\n",input);
+	printf("%s",input);
 
 	return 0;
 }
