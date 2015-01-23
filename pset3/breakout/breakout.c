@@ -74,7 +74,7 @@ int main(void)
 	GTimer timer;
 	// event handler
 	GEvent event;
-	// 17ms is about 60hZ refresh rate
+	// 17ms is about 60Hz refresh rate
 	timer = newGTimer(17);
 	startTimer(timer);
 
