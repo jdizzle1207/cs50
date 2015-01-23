@@ -78,13 +78,17 @@ int main(void)
 	timer = newGTimer(17);
 	startTimer(timer);
 
+	// paddle won't move up/down no need to check every iteration
+	int paddleY = getLocation(paddle).y;
+	
     // keep playing until game over
     while (lives > 0 && bricks > 0)
     {
+
 	    event = waitForEvent(MOUSE_EVENT);
 	    if ( getEventType(event) == MOUSE_MOVED )
 	    {
-		    setLocation(paddle, getX(event)-(getWidth(paddle)/2), getLocation(paddle).y);
+		    setLocation(paddle, getX(event)-(getWidth(paddle)/2), paddleY);
 	    }
 	    else freeEvent(event);
     }
@@ -104,7 +108,21 @@ int main(void)
  */
 void initBricks(GWindow window)
 {
-    // TODO
+	// figure the size of a brick
+	int width = getWidth(window) / COLS;
+	// take up the 10% third of window;
+	int height = (getHeight(window) / 10) / ROWS;
+	// for each row
+    for (int row = 0; row < ROWS; row++)
+	{
+		// and each column within that row
+		for (int col = 0; col < COLS; col++)
+		{
+			// create brick with spacing
+			GRect brick = newGRect(col * width + 2, row * height + 2, width - 5, height - 5);
+			add(window, brick);
+		}
+	}
 }
 
 /**

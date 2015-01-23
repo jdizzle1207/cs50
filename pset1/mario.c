@@ -4,7 +4,7 @@
  * Andrew Siplas
  * sippy87@gmail.com
  *
- * prompts user for height and displays 'mario pyramid' in terminal
+ * prompts user for height and sends half pyramid to stdout
  */
 
 #include <stdio.h>
