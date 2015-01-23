@@ -109,6 +109,8 @@ int main(void)
 void initBricks(GWindow window)
 {
 	// figure the size of a brick
+	// add some color (if length change, change modulo below in setColor) 
+	char* color[] = {"green", "blue", "red", "yellow", "orange", "magenta", "pink", "dark gray", "gray", "light gray"};
 	int width = getWidth(window) / COLS;
 	// take up the 10% third of window;
 	int height = (getHeight(window) / 10) / ROWS;
@@ -120,6 +122,8 @@ void initBricks(GWindow window)
 		{
 			// create brick with spacing
 			GRect brick = newGRect(col * width + 2, row * height + 2, width - 5, height - 5);
+			setFilled(brick, true);
+			setColor(brick, color[row%9]);
 			add(window, brick);
 		}
 	}
@@ -131,8 +135,10 @@ void initBricks(GWindow window)
  */
 GOval initBall(GWindow window)
 {
-    // TODO
-    return NULL;
+	GOval ball = newGOval((getWidth(window)/2)-10, (getHeight(window)/2)-10, 20, 20);
+	setFilled(ball, true);
+	add(window, ball);
+    return ball;
 }
 
 /**
