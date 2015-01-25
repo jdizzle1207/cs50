@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include "helpers.h"
 
+//prototypes
+bool binsrch(int value, int array[], int min, int max);
+
+
 /**
  * Returns true if value is in array of n values, else false.
  */
@@ -39,7 +43,6 @@ void sort(int values[], int n)
 			}
 		}
 	}
-	return;
 }
 
 /**
@@ -62,8 +65,6 @@ bool binsrch(int value, int array[], int min, int max)
 	// if not there, find out which half it *may* be in, then search that
 	if ( array[mid] > value ) return binsrch(value, array, min, mid-1);
 	if ( array[mid] < value ) return binsrch(value, array, mid+1, max);
-
-	else printf("ERROR?!?\n");
 
 	return false;
 }
