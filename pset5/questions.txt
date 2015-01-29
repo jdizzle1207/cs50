@@ -1,0 +1,75 @@
+0.  BMP files vary in the number of colors supported, depending on
+    the number of bits per pixel; for example, 24bit BMP can represent
+    over 16 Million, while 1bit BMP can represent only 2 colors. A GIF
+    file may represent 256 colors, with a separate palette for each
+    frame. JPEG and PNG files can represent over 16 Million colors as
+    they store 24 bits per pixel.
+
+1.  The GIF file format supports animation.
+
+2.  Lossless compression allows for no loss of data when
+    compressed, and the decompressed file shall be indistinguishable
+    from the original uncompressed file. Lossy compression allows for
+    greater compression, at the risk of a file quite a bit different,
+    potentially, than the original, after compression and
+    decompression, but which may not appear much, if at all, different
+    to human perception, making it great for audio, video, and other
+    file formats intended for human consumption.
+3.  JPEG files feature lossy compression.
+
+4.  When a file is deleted from a FAT filesystem, the system will make
+    the first character of the filename a 'sigma' or 0xE5 and will mark
+    the sectors containing said file's data unused/free for use, but will
+    not typically overwrite upon simple deletion.
+
+5.  Someone like me could instruct system to overwrite files that I
+    delete with data, perhaps random data, upon multiple passes, to ensure
+    files will not be (easily) recoverable.
+
+6.  The stdint.h header file defines new data types of specific
+    lengths that may be used, and defines set or minimum and maximum
+    lengths/values for these new types; this allows us, for example, to
+    work with a number of fixed length, even if that is not how the
+    machine natively stores it.  
+
+7.  Using uint8_t, etc. ensures that the representation of a value is
+    as we expect in terms of length, whether it is signed, and the minimum
+    and maximum values that may be stored in them. This would be useful in
+    our case so we read/write RGB information without padding, which may
+    cause white space or other unexpected results if editing a bitmap
+    file.
+
+8.  BYTE is 1 byte in length, DWORD is 4 bytes, LONG is 4 bytes, and
+    WORD is 2 bytes.
+
+9.  The "magic number" of a BMP file is 0x424d or 'BM' in ASCII.
+
+10. bfSize declares the entire file's size in bytes, while biSize
+    declares the size in bytes of the BITMAPINFOHEADER (usually 40).
+
+11. if biHeight is negative, the image is 'drawn' line by line from
+    the top left pixel, as opposed to being 'drawn' from the bottom line
+    up (still drawn left to right though).
+
+12. A BMP file's color depth is stored in the biBitCount field of
+    BITMAPINFOHEADER.
+
+13. fopen() may return NULL at copy.c:37 if it is unable to open a
+    file for writing, or is unable to complete the process of opening a
+    pointer to a file for another reason, as indicated by the 'errno'
+    returned.
+
+14. The 3rd arg. to fread() is always 1 in our code because we'd like
+    to read from STDOUT stream, as opposed to STDIN (0), or STDERR (2).
+
+15. If bi.biWidth is 3, then copy.c:70 will assign int padding 3.
+
+16. fseek() sets the file position indicator by taking a pointer to
+    the stream, a number of bytes to offset by, and the starting position
+    that we offset from.
+
+17. SEEK_CUR represents the current position in the stream, useful
+    when calling fseek() so that we may move an arbitrary number of bytes
+    forward from our current position, for example.
+
+18. Milo Banana dun it.
