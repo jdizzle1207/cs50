@@ -31,6 +31,7 @@
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
+#include <ctype.h>
 
 // types
 typedef char octet;
@@ -439,8 +440,26 @@ void handler(int signal)
  */
 const char* lookup(const char* extension)
 {
-    // TODO
-    return NULL;
+	// convert to lowercase first
+	char* lcext;
+	lcext = malloc(sizeof(char)*strlen(extension));
+	for (int i = 0; i < strlen(extension); i++)
+	{
+		lcext[i] = tolower(extension[i]);
+	}
+    char* ext[] = {"css", "html", "gif", "ico", "jpg", "js", "png"};
+    char* mime[] = {"text/css", "text/html", "image/gif", "image/x-icon", "image/jpeg", "text/javascript", "image/png"};
+
+    for (int i = 0; i < 7; i++)
+    {
+	if (strcmp(lcext, ext[i]) == 0)
+	{
+		free(lcext);
+		return mime[i];
+	}
+    }
+    	free(lcext);
+	return NULL;
 }
 
 /**
