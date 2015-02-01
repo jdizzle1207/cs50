@@ -146,10 +146,57 @@ int main(int argc, char* argv[])
             // log request-line
             printf("%s", line);
 
-            // TODO: validate request-line
+            // validate request-line
+            char* requesttarget = strchr(line, ' ');
+            if (requesttarget == NULL)
+            {
+                error(400);
+                continue;
+            }
+            char* httpversion = strchr(requesttarget + 1, ' ');
+            if (httpversion == NULL)
+            {
+                error(400);
+                continue;
+            }
+            // any further spaces means garbage in
+            if (strchr(httpversion + 1, ' ') != NULL)
+            {
+                // we don't want no garbage out
+                error(400);
+                continue;
+            }
+            // if there's a quote (") in requesttarget, error
+            if (strchr(requesttarget, '"') != 0)
+            {
+                error(400);
+                continue;
+            }             
+            // request to end with CRLF -- check for that
+            char* crlf = strstr(httpversion, "\r\n");
+            if (crlf == NULL)
+            {
+                error(400);
+                continue;
+            }
+            // change space delimiters to null terminators
+            // and align pointers for easy parsing below
+            *requesttarget = '\0';
+            *httpversion = '\0';
+            *crlf = '\0';
+            requesttarget++;
+            httpversion++;
+            crlf++;
 
-            // TODO: extract query from request-target
-            char query[] = "TODO";
+            // extract query from request-target
+            char* queryPtr = strchr(requesttarget, '?');
+            char* query;
+            if (queryPtr++ == NULL) query = NULL;
+            else
+            {
+                query = malloc(sizeof(char)*strlen(queryPtr)+1);
+                strcpy(query, queryPtr);
+            }
 
             // TODO: concatenate root and absolute-path
             char path[] = "TODO";
@@ -168,6 +215,8 @@ int main(int argc, char* argv[])
                 char* format = "QUERY_STRING=\"%s\" REDIRECT_STATUS=200 SCRIPT_FILENAME=\"%s\" php-cgi";
                 char command[strlen(format) + (strlen(path) - 2) + (strlen(query) - 2) + 1];
                 sprintf(command, format, query, path);
+                // free query malloc'd above
+                free(query);
                 file = popen(command, "r");
                 if (file == NULL)
                 {
