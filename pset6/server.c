@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
     {
         // announce usage
         printf("%s\n", usage);
-
+    
         // return 2 just like bash's builtins
         return 2;
     }
@@ -188,25 +188,78 @@ int main(int argc, char* argv[])
             httpversion++;
             crlf++;
 
+            // only support GET
+            if (strcmp(line, "GET") != 0)
+            {
+                error(405);
+                continue;
+            }
+
+            // request target must begin with '/'
+            if (*requesttarget != '/')
+            {
+                error(501);
+                continue;
+            }
+
+            // check for http version, we support only 1.1
+            if (strcmp(httpversion, "HTTP/1.1") != 0)
+            {
+                error(505);
+                continue;
+            }
+
             // extract query from request-target
             char* queryPtr = strchr(requesttarget, '?');
             char* query;
-            if (queryPtr++ == NULL) query = NULL;
+            if (queryPtr == NULL)
+            {
+                query = malloc(sizeof(char));
+                *query = '\0';
+            }
             else
             {
+                *queryPtr = '\0';
+                queryPtr++;
                 query = malloc(sizeof(char)*strlen(queryPtr)+1);
                 strcpy(query, queryPtr);
             }
 
-            // TODO: concatenate root and absolute-path
-            char path[] = "TODO";
+            // file extension required (check for dot)
+            if (strchr(requesttarget, '.') == NULL)
+            {
+                error(501);
+                continue;
+            }
 
-            // TODO: ensure path exists
+            // concatenate root and absolute-path
+            char* path;
+            path = malloc(sizeof(char)*(strlen(argv[argc-1])+strlen(requesttarget)+1));
+            strcpy(path, argv[argc-1]);
+            strcat(path, requesttarget);
+
+            // ensure path exists
+            if (access(path, F_OK))
+            {
+                error(404);
+                continue;
+            }
             
-            // TODO: ensure path is readable
+            // ensure path is readable
+            if (access(path, R_OK))
+            {
+                error(403);
+                continue;
+            }
  
-            // TODO: extract path's extension
-            char extension[] = "TODO";
+            // extract path's extension
+            char* extension = strrchr(path, '.');
+            if (extension == NULL)
+            {
+                error(501);
+                continue;
+            }
+            extension++;
 
             // dynamic content
             if (strcasecmp("php", extension) == 0)
@@ -251,7 +304,7 @@ int main(int argc, char* argv[])
                 {
                     continue;
                 }
-                if (dprintf(cfd, "Content-Length: %i\r\n", length) < 0)
+                if (dprintf(cfd, "Content-Length: %zu\r\n", length) < 0)
                 {
                     continue;
                 }
