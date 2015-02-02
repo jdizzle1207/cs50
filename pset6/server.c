@@ -341,7 +341,30 @@ int main(int argc, char* argv[])
                     continue;
                 }
 
-                // TODO: respond to client
+                FILE* output;
+                output = fopen(path, "r");
+                if (output == NULL)
+                {
+                    error (404);
+                    continue;
+                }
+
+                dprintf(cfd, "HTTP/1.1 200 OK\r\n");
+                dprintf(cfd, "Connection: close\r\n");
+
+                // seek to end of file to find size
+                fseek(output, 0, SEEK_END);
+                dprintf(cfd, "Content-Length: %li\r\n", ftell(output));
+                dprintf(cfd, "Content-Type: %s\r\n", type);
+
+                // seek back to beginning
+                fseek(output, 0, SEEK_SET);
+
+                char outputbuffer[OCTETS];
+                while (fgets(outputbuffer, OCTETS, output) != NULL)
+                   dprintf(cfd, "%s", outputbuffer); 
+
+
             }
             
             // announce OK
