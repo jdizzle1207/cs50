@@ -214,8 +214,7 @@ int main(int argc, char* argv[])
             char* query;
             if (queryPtr == NULL)
             {
-                query = malloc(sizeof(char));
-                *query = '\0';
+                query = NULL;
             }
             else
             {
@@ -241,6 +240,7 @@ int main(int argc, char* argv[])
             // ensure path exists
             if (access(path, F_OK))
             {
+                free(path);
                 error(404);
                 continue;
             }
@@ -248,6 +248,7 @@ int main(int argc, char* argv[])
             // ensure path is readable
             if (access(path, R_OK))
             {
+                free(path);
                 error(403);
                 continue;
             }
@@ -256,6 +257,7 @@ int main(int argc, char* argv[])
             char* extension = strrchr(path, '.');
             if (extension == NULL)
             {
+                free(path);
                 error(501);
                 continue;
             }
@@ -268,8 +270,9 @@ int main(int argc, char* argv[])
                 char* format = "QUERY_STRING=\"%s\" REDIRECT_STATUS=200 SCRIPT_FILENAME=\"%s\" php-cgi";
                 char command[strlen(format) + (strlen(path) - 2) + (strlen(query) - 2) + 1];
                 sprintf(command, format, query, path);
-                // free query malloc'd above
+                // free query and path malloc'd above
                 free(query);
+                free(path);
                 file = popen(command, "r");
                 if (file == NULL)
                 {
@@ -321,6 +324,7 @@ int main(int argc, char* argv[])
                 const char* type = lookup(extension);
                 if (type == NULL)
                 {
+                    free(path);
                     error(501);
                     continue;
                 }
@@ -329,6 +333,7 @@ int main(int argc, char* argv[])
                 file = fopen(path, "r");
                 if (file == NULL)
                 {
+                    free(path);
                     error(500);
                     continue;
                 }
@@ -337,12 +342,15 @@ int main(int argc, char* argv[])
                 ssize_t length = load();
                 if (length == -1)
                 {
+                    free(path);
                     error(500);
                     continue;
                 }
 
                 FILE* output;
                 output = fopen(path, "r");
+                // free path malloc'd above
+                free(path);
                 if (output == NULL)
                 {
                     error (404);
@@ -357,12 +365,18 @@ int main(int argc, char* argv[])
                 dprintf(cfd, "Content-Length: %li\r\n", ftell(output));
                 dprintf(cfd, "Content-Type: %s\r\n", type);
 
+                // close out headers and send file
+                dprintf(cfd, "\r\n\r\n");
+
                 // seek back to beginning
                 fseek(output, 0, SEEK_SET);
 
                 char outputbuffer[OCTETS];
                 while (fgets(outputbuffer, OCTETS, output) != NULL)
-                   dprintf(cfd, "%s", outputbuffer); 
+                   dprintf(cfd, "%s", outputbuffer);
+
+                // close out file
+                fclose(output);
 
 
             }
@@ -567,7 +581,8 @@ const char* lookup(const char* extension)
 {
 	// convert to lowercase first
 	char* lcext;
-	lcext = malloc(sizeof(char)*strlen(extension));
+	lcext = malloc(sizeof(char)*strlen(extension)+1);
+    lcext[strlen(lcext)+1] = '\0';
 	for (int i = 0; i < strlen(extension); i++)
 	{
 		lcext[i] = tolower(extension[i]);
